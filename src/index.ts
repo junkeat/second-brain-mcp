@@ -2,7 +2,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { searchNotes, readNote, editNote } from "./services/markdown.js";
+import { searchNotes, readNote, editNote, readCode } from "./services/markdown.js";
 
 // 1. Initialize the server
 const server = new McpServer({
@@ -79,6 +79,23 @@ server.tool(
           }
         ] 
       };
+    }
+  }
+);
+
+server.tool(
+  "draft_readme",
+  "Draft a README.md file for a codebase by reading all .ts, .js, and .json files in the specified directory",
+  {
+    codePath: z.string().describe("The path to the codebase directory"),
+  },
+  async ({ codePath }) => {
+    try {
+      const codeContents = await readCode(codePath);
+      return { content: [{ type: "text", text: codeContents }] };
+    }
+    catch (error) {
+      return { content: [{ type: "text", text: `Error reading code: ${error}` }] };
     }
   }
 );
