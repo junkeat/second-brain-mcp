@@ -30,6 +30,11 @@ export async function editNote(filename: string, content: string): Promise<void>
   await fs.writeFile(safePath, content, 'utf-8');
 }
 
+export async function addNote(filename: string, content: string): Promise<void> {
+  const safePath = path.join(VAULT_PATH, filename);
+  await fs.writeFile(safePath, content, 'utf-8');
+}
+
 export async function readCode(codePath: string): Promise<string> {
   const files = await fs.readdir(codePath, { recursive: true });
   let codeFiles = files.filter(f => f.endsWith('.ts') || f.endsWith('.js') || f.endsWith('.json'));

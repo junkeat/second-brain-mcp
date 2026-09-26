@@ -2,7 +2,7 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
-import { searchNotes, readNote, editNote, readCode } from "./services/markdown.js";
+import { searchNotes, readNote, editNote, readCode, addNote } from "./services/markdown.js";
 
 // 1. Initialize the server
 const server = new McpServer({
@@ -82,6 +82,40 @@ server.tool(
     }
   }
 );
+
+server.registerTool(
+  "add_note",
+  {
+    title: "Add Note",
+    description: "Add a new markdown note with specified content",
+    inputSchema: z.object({
+      filename: z.string().describe("The exact filename including .md extension"),
+      content: z.string().describe("The full markdown content to save to the file"),
+    }),
+  },
+  async ({ filename, content }) => {
+    try {
+      await addNote(filename, content);
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Success: Added ${filename} successfully.`,
+          },
+        ],
+      };
+    } catch (error) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: `Error adding note: ${error}`,
+          },
+        ],
+      };
+    }
+  }
+)
 
 server.tool(
   "draft_readme",
