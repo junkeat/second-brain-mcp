@@ -35,6 +35,7 @@ export async function readCode(codePath: string): Promise<string> {
   let codeFiles = files.filter(f => f.endsWith('.ts') || f.endsWith('.js') || f.endsWith('.json'));
   codeFiles = codeFiles.filter(f => !f.endsWith('.d.ts')); // Exclude TypeScript declaration files
   codeFiles = codeFiles.filter(f => !f.includes('node_modules')); // Exclude node_modules
+  codeFiles = codeFiles.filter(f => !f.includes('package-lock.json')); // Exclude package-lock.json
   const codeContents = await Promise.all(codeFiles.map(f => fs.readFile(path.join(codePath, f), 'utf-8')));
 
   return codeContents.join('\n\n');
